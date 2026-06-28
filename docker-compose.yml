@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17.10
+    container_name: packlead-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: packlead
+      POSTGRES_PASSWORD: packlead_dev
+      POSTGRES_DB: packlead_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - packlead_pgdata:/var/lib/postgresql/data
+
+volumes:
+  packlead_pgdata:
