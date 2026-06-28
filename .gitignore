@@ -361,3 +361,24 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+## .NET / Visual Studio core
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+!appsettings.json
+!appsettings.Example.json
+
+# Docker
+.env
+docker-compose.override.yml
+
+# EF Core / Local DB
+*.db
