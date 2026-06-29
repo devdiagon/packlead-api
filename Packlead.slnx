@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Packlead.Api/Packlead.Api.csproj" />
   <Project Path="Packlead.Application/Packlead.Application.csproj" Id="c6ca7dfb-e54d-4302-9d6e-bf5787fb43c3" />
+  <Project Path="Packlead.Domain.Tests/Packlead.Domain.Tests.csproj" Id="cf6abfcc-6dd0-4da3-8c44-17f8bc500981" />
   <Project Path="Packlead.Domain/Packlead.Domain.csproj" Id="af288b44-208e-49d4-98ce-a77acb457e28" />
   <Project Path="Packlead.Infrastructure/Packlead.Infrastructure.csproj" Id="217d47d0-9383-4e30-a316-dd361a64d859" />
 </Solution>
