@@ -63,4 +63,20 @@ public class Order
 
         State = OrderState.Delivered;
     }
+
+    public void UpdateDetails(
+        string clientName,
+        string clientPhoneNumber,
+        Location location,
+        string? address,
+        string zone,
+        DateTime deliveryDate)
+    {
+        ClientName = clientName;
+        ClientPhoneNumber = clientPhoneNumber;
+        Location = location;
+        Address = address;
+        Zone = zone;
+        DeliveryDate = deliveryDate;
+    }
 }

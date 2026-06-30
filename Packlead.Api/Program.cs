@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Packlead.Application.Common.Interfaces;
+using Packlead.Application.Orders.Commands;
+using Packlead.Application.Orders.Queries;
 using Packlead.Infrastructure.Persistence;
 using Packlead.Infrastructure.Repositories;
 
@@ -11,6 +13,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IDispatcherRepository, DispatcherRepository>();
+
+// Commands
+builder.Services.AddScoped<CreateOrderCommand>();
+builder.Services.AddScoped<UpdateOrderCommand>();
+builder.Services.AddScoped<DeleteOrderCommand>();
+
+// Queries
+builder.Services.AddScoped<GetAllOrdersQuery>();
+builder.Services.AddScoped<GetOrderByIdQuery>();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
