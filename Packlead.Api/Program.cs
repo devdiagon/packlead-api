@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Packlead.Api.Middleware;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.Commands;
 using Packlead.Application.Dispatchers.Queries;
@@ -42,6 +43,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
