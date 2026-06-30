@@ -29,7 +29,13 @@ public class DispatcherRepository : IDispatcherRepository
         return await _context.Dispatchers.FirstOrDefaultAsync(d => d.FirebaseUid == firebaseUid, ct);
     }
 
-    public async Task AddAsync(Dispatcher dispatcher, CancellationToken ct = default)
+    public async Task<bool> ExistsByFirebaseUidAsync(string firebaseUid)
+    {
+        return await _context.Dispatchers
+            .AnyAsync(d => d.FirebaseUid == firebaseUid);
+    }
+
+    public async Task CreateAsync(Dispatcher dispatcher, CancellationToken ct = default)
     {
         await _context.Dispatchers.AddAsync(dispatcher, ct);
         await _context.SaveChangesAsync(ct);

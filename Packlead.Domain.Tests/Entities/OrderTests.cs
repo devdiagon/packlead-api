@@ -1,5 +1,6 @@
 ﻿using Packlead.Domain.Entities;
 using Packlead.Domain.Enums;
+using Packlead.Domain.Exceptions;
 using Packlead.Domain.ValueObjects;
 using Xunit;
 
@@ -30,7 +31,7 @@ public class OrderTests
     {
         var order = CreateValidOrder();
 
-        var ex = Assert.Throws<InvalidOperationException>(() => order.MarkAsShipped());
+        var ex = Assert.Throws<InvalidStateTransitionException>(() => order.MarkAsShipped());
         Assert.Contains("no dispatcher assigned", ex.Message);
     }
 
@@ -50,7 +51,7 @@ public class OrderTests
     {
         var order = CreateValidOrder();
 
-        Assert.Throws<InvalidOperationException>(() => order.MarkAsDelivered());
+        Assert.Throws<InvalidStateTransitionException>(() => order.MarkAsDelivered());
     }
 
     [Fact]
