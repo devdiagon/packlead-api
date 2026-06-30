@@ -1,5 +1,6 @@
 ﻿using Packlead.Domain.Enums;
 using Packlead.Domain.ValueObjects;
+using Packlead.Domain.Exceptions;
 
 namespace Packlead.Domain.Entities;
 
@@ -48,10 +49,10 @@ public class Order
     public void MarkAsShipped()
     {
         if (State != OrderState.Pending)
-            throw new InvalidOperationException($"Cannot ship an order in state '{State}'. Must be 'Pending'.");
+            throw new InvalidStateTransitionException($"Cannot ship an order in state '{State}'. Must be 'Pending'.");
 
         if (DispatcherId is null)
-            throw new InvalidOperationException("Cannot ship an order with no dispatcher assigned.");
+            throw new InvalidStateTransitionException("Cannot ship an order with no dispatcher assigned.");
 
         State = OrderState.Shipped;
     }
@@ -59,7 +60,7 @@ public class Order
     public void MarkAsDelivered()
     {
         if (State != OrderState.Shipped)
-            throw new InvalidOperationException($"Cannot deliver an order in state '{State}'. Must be 'Shipped'.");
+            throw new InvalidStateTransitionException($"Cannot deliver an order in state '{State}'. Must be 'Shipped'.");
 
         State = OrderState.Delivered;
     }

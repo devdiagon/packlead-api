@@ -9,14 +9,6 @@ public class OrderNotFoundException : AppException
         : base($"Order with id '{id}' was not found.") { }
 }
 
-public class InvalidStateTransitionException : AppException
-{
-    public override int StatusCode => 400;
-    public override string ErrorCode => "InvalidStateTransition";
-
-    public InvalidStateTransitionException(string message) : base(message) { }
-}
-
 public class DispatcherNotAvailableException : AppException
 {
     public override int StatusCode => 409;
