@@ -1,10 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
+
 using Packlead.Api.Middleware;
+using Packlead.Api.Filters;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.Commands;
 using Packlead.Application.Dispatchers.Queries;
 using Packlead.Application.Orders.Commands;
 using Packlead.Application.Orders.Queries;
+using Packlead.Application.Orders.Validators;
 using Packlead.Infrastructure.Persistence;
 using Packlead.Infrastructure.Repositories;
 
@@ -31,8 +35,13 @@ builder.Services.AddScoped<GetOrderByIdQuery>();
 builder.Services.AddScoped<GetAllDispatchersQuery>();
 builder.Services.AddScoped<GetDispatcherByIdQuery>();
 
+// Validators
+builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderRequestValidator>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+});
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
