@@ -29,4 +29,12 @@ public class Dispatcher
     }
 
     public void SetState(DispatcherState newState) => State = newState;
+
+    public void UpdateDetails(string name, string email, string vehicle, string licensePlate)
+    {
+        Name = name;
+        Email = email;
+        Vehicle = vehicle;
+        LicensePlate = licensePlate;
+    }
 }
