@@ -2,6 +2,7 @@ using FirebaseAdmin;
 using FluentValidation;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using Packlead.Api.Filters;
 using Packlead.Api.Middleware;
 using Packlead.Application.Common.Interfaces;
@@ -47,12 +48,30 @@ builder.Services.AddScoped<GetDispatcherByIdQuery>();
 // Validators
 builder.Services.AddValidatorsFromAssemblyContaining<CreateOrderRequestValidator>();
 
+// Controllers
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
 });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// OpenApi with scalar
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((doc, ctx, ct) =>
+    {
+        doc.Components ??= new();
+        doc.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+
+        doc.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT"
+        };
+
+        return Task.CompletedTask;
+    });
+});
 
 // Firebase configuration
 var serviceAccountPath = builder.Configuration["Firebase:ServiceAccountPath"]
@@ -69,8 +88,11 @@ builder.Services.AddSingleton(sp =>
 });
 
 var app = builder.Build();
+app.Services.GetRequiredService<FirebaseApp>();
 
+// Middlewares
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<FirebaseAuthenticationMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
