@@ -25,9 +25,15 @@ public class ExceptionHandlingMiddleware
         {
             await WriteErrorResponse(context, ex.StatusCode, ex.ErrorCode, ex.Message);
         }
-        catch (InvalidStateTransitionException ex)
+        catch (DomainExceptions ex)
         {
-            await WriteErrorResponse(context, 400, "InvalidStateTransition", ex.Message);
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                status = 400,
+                error = ex.GetType().Name.Replace("Exception", string.Empty),
+                message = ex.Message
+            });
         }
         catch (Exception ex)
         {

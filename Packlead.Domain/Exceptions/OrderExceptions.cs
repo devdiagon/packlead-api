@@ -1,6 +1,11 @@
 ﻿namespace Packlead.Domain.Exceptions;
 
-public class InvalidStateTransitionException : Exception
+public class InvalidStateTransitionException : DomainExceptions
 {
     public InvalidStateTransitionException(string message) : base(message) { }
+}
+
+public class InvalidLocationException : DomainExceptions
+{
+    public InvalidLocationException(string message) : base(message) { }
 }
