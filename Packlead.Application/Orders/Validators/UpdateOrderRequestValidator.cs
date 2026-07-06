@@ -3,7 +3,7 @@ using Packlead.Application.Orders.DTOs;
 
 namespace Packlead.Application.Orders.Validators;
 
-public class UpdateOrderRequestValidator : AbstractValidator<CreateOrderRequest>
+public class UpdateOrderRequestValidator : AbstractValidator<UpdateOrderRequest>
 {
     public UpdateOrderRequestValidator()
     {

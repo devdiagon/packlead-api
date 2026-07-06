@@ -42,6 +42,9 @@ public class Order
 
     public void AssignDispatcher(Guid dispatcherId)
     {
+        if (dispatcherId == Guid.Empty)
+            throw new InvalidDispatcherIdException("Dispatcher could not be resolved.");
+
         DispatcherId = dispatcherId;
     }
 

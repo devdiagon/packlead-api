@@ -8,10 +8,12 @@ namespace Packlead.Application.Orders.Commands;
 public class UpdateOrderCommand
 {
     private readonly IOrderRepository _repository;
+    private readonly IDispatcherRepository _dispatcherRepository;
 
-    public UpdateOrderCommand(IOrderRepository repository)
+    public UpdateOrderCommand(IOrderRepository repository, IDispatcherRepository dispatcherRepository)
     {
         _repository = repository;
+        _dispatcherRepository = dispatcherRepository;
     }
 
     public async Task<OrderResponse?> ExecuteAsync(Guid id, UpdateOrderRequest request, CancellationToken ct = default)
@@ -29,7 +31,20 @@ public class UpdateOrderCommand
             deliveryDate: request.DeliveryDate);
 
         if (request.DispatcherId is not null)
+        {
+            // Solo consultar la DB si efectivamente se está cambiando el dispatcher asignado
+            if (order.DispatcherId != request.DispatcherId.Value)
+            {
+                var dispatcher = await _dispatcherRepository.GetByIdAsync(request.DispatcherId.Value, ct);
+
+                if (dispatcher is null)
+                    throw new DispatcherNotFoundException();
+
+                if (dispatcher.State != DispatcherState.Available)
+                    throw new DispatcherNotAvailableException("El repartidor no se encuentra disponible.");
+            }
             order.AssignDispatcher(request.DispatcherId.Value);
+        }
 
         // Transición de estado — siempre por los métodos de dominio
         if (Enum.TryParse<OrderState>(request.State, ignoreCase: true, out var newState))
