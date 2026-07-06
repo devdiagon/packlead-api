@@ -15,7 +15,7 @@ public class DeleteDispatcherCommand
     public async Task ExecuteAsync(Guid id)
     {
         var dispatcher = await _repository.GetByIdAsync(id)
-            ?? throw new DispatcherNotFoundException(id);
+            ?? throw new DispatcherNotFoundException();
 
         await _repository.DeleteAsync(dispatcher.Id);
     }

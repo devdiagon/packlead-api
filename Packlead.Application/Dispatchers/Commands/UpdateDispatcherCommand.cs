@@ -17,7 +17,7 @@ public class UpdateDispatcherCommand
     public async Task<DispatcherResponse> ExecuteAsync(Guid id, UpdateDispatcherRequest request)
     {
         var dispatcher = await _repository.GetByIdAsync(id)
-            ?? throw new DispatcherNotFoundException(id);
+            ?? throw new DispatcherNotFoundException();
 
         dispatcher.UpdateDetails(
             name: request.Name,

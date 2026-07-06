@@ -16,7 +16,7 @@ public class GetDispatcherByIdQuery
     public async Task<DispatcherResponse> ExecuteAsync(Guid id)
     {
         var dispatcher = await _repository.GetByIdAsync(id)
-            ?? throw new DispatcherNotFoundException(id);
+            ?? throw new DispatcherNotFoundException();
 
         return dispatcher.ToResponse();
     }
