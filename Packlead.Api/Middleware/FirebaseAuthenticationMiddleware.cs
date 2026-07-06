@@ -55,6 +55,18 @@ public class FirebaseAuthenticationMiddleware
             claims.Add(new Claim("dispatcherId", dispatcher.Id.ToString()));
         }
 
+        if (string.Equals(role, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            await context.Response.WriteAsJsonAsync(new
+            {
+                status = 404,
+                error = "NotFound",
+                message = "No se ha podido identificar este usuario."
+            });
+            return;
+        }
+
         context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Firebase"));
         await _next(context);
     }
