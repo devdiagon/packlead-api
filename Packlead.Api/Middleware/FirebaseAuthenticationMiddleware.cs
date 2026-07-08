@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
+using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
 using System.Security.Claims;
 
@@ -38,11 +39,17 @@ public class FirebaseAuthenticationMiddleware
         }
 
         var role = decoded.Claims.TryGetValue("role", out var r) ? r?.ToString() : "none";
+        role ??= "none";
+
+        if (string.Equals(role, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new MissingRoleClaimException();
+        }
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, decoded.Uid),
-            new("role", role ?? "none")
+            new(ClaimTypes.Role, role)
         };
 
         if (string.Equals(role, "dispatcher", StringComparison.OrdinalIgnoreCase))
@@ -53,18 +60,6 @@ public class FirebaseAuthenticationMiddleware
                 throw new DispatcherRecordMissingException();
 
             claims.Add(new Claim("dispatcherId", dispatcher.Id.ToString()));
-        }
-
-        if (string.Equals(role, "none", StringComparison.OrdinalIgnoreCase))
-        {
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            await context.Response.WriteAsJsonAsync(new
-            {
-                status = 404,
-                error = "NotFound",
-                message = "No se ha podido identificar este usuario."
-            });
-            return;
         }
 
         context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Firebase"));
