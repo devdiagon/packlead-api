@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
+using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
 using System.Security.Claims;
 
@@ -39,6 +40,11 @@ public class FirebaseAuthenticationMiddleware
 
         var role = decoded.Claims.TryGetValue("role", out var r) ? r?.ToString() : "none";
         role ??= "none";
+
+        if (string.Equals(role, "none", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new MissingRoleClaimException();
+        }
 
         var claims = new List<Claim>
         {
