@@ -3,6 +3,7 @@ using FluentValidation;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using System.Security.Claims;
 using Packlead.Api.Filters;
 using Packlead.Api.Middleware;
 using Packlead.Application.Common.Interfaces;
@@ -53,6 +54,20 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ValidationFilter>();
 });
+
+// Authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim(ClaimTypes.Role, "admin"));
+
+    options.AddPolicy("DispatcherOnly", policy =>
+        policy.RequireClaim(ClaimTypes.Role, "dispatcher"));
+
+    options.AddPolicy("AuthenticatedOnly", policy =>
+        policy.RequireAuthenticatedUser());
+});
+
 
 // OpenApi with scalar
 builder.Services.AddOpenApi(options =>

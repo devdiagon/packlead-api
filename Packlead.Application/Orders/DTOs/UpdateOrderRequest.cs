@@ -1,6 +1,6 @@
 ﻿namespace Packlead.Application.Orders.DTOs;
 
-public class UpdateOrderRequest
+public record class UpdateOrderRequest
 {
     public Guid? DispatcherId { get; init; }
     public string ClientName { get; init; } = string.Empty;
