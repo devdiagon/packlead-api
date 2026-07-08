@@ -1,10 +1,12 @@
 using FirebaseAdmin;
 using FluentValidation;
 using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
-using System.Security.Claims;
 using Packlead.Api.Filters;
+using Packlead.Api.Handlers;
 using Packlead.Api.Middleware;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.Commands;
@@ -15,6 +17,7 @@ using Packlead.Application.Orders.Validators;
 using Packlead.Infrastructure.Persistence;
 using Packlead.Infrastructure.Repositories;
 using Scalar.AspNetCore;
+using System.Security.Claims;
 
 static GoogleCredential LoadServiceAccountCredential(string path)
 {
@@ -55,6 +58,11 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>();
 });
 
+// Authentication scheme (no-op: HttpContext.User puebla FirebaseAuthenticationMiddleware)
+builder.Services
+    .AddAuthentication("Firebase")
+    .AddScheme<AuthenticationSchemeOptions, NoOpAuthenticationHandler>("Firebase", _ => { });
+
 // Authorization policies
 builder.Services.AddAuthorization(options =>
 {
@@ -68,6 +76,8 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser());
 });
 
+// Custom 401/403 envelope (en lugar del default Forbid/Challenge)
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, JsonAuthorizationResultHandler>();
 
 // OpenApi with scalar
 builder.Services.AddOpenApi(options =>
