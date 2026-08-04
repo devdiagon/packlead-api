@@ -57,9 +57,9 @@ public class DispatchersController : ControllerBase
 
     [Authorize(Policy = "AdminOnly")]
     [HttpPost]
-    public async Task<ActionResult<DispatcherResponse>> Create(CreateDispatcherRequest request)
+    public async Task<ActionResult<CreateDispatcherResponse>> Create(CreateDispatcherRequest request, CancellationToken ct)
     {
-        var result = await _create.ExecuteAsync(request);
+        var result = await _create.ExecuteAsync(request, ct);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
 
