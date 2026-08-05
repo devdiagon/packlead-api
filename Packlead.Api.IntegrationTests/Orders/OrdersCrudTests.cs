@@ -6,7 +6,9 @@ using Packlead.Application.Orders.DTOs;
 using Packlead.Infrastructure.Persistence;
 
 namespace Packlead.Api.IntegrationTests.Orders;
-public class OrdersCrudTests : IClassFixture<PackleadApiFactory>
+
+[Collection(PackleadApiCollection.Name)]
+public class OrdersCrudTests
 {
     private readonly PackleadApiFactory _factory;
 

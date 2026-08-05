@@ -6,7 +6,8 @@ using Packlead.Infrastructure.Persistence;
 
 namespace Packlead.Api.IntegrationTests.Auth;
 
-public class AuthorizationOwnershipTests : IClassFixture<PackleadApiFactory>
+[Collection(PackleadApiCollection.Name)]
+public class AuthorizationOwnershipTests
 {
     private readonly PackleadApiFactory _factory;
 

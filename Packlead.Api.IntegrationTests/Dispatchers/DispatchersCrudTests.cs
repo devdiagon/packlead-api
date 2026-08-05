@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Packlead.Api.IntegrationTests.Infrastructure;
 using Packlead.Application.Common.Exceptions;
@@ -11,7 +8,9 @@ using System.Net;
 using System.Net.Http.Json;
 
 namespace Packlead.Api.IntegrationTests.Dispatchers;
-public class DispatchersCrudTests : IClassFixture<PackleadApiFactory>
+
+[Collection(PackleadApiCollection.Name)]
+public class DispatchersCrudTests
 {
     private readonly PackleadApiFactory _factory;
 

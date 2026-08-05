@@ -3,7 +3,9 @@ using System.Net.Http.Json;
 using Packlead.Api.IntegrationTests.Infrastructure;
 
 namespace Packlead.Api.IntegrationTests.Auth;
-public class AuthenticationTests : IClassFixture<PackleadApiFactory>
+
+[Collection(PackleadApiCollection.Name)]
+public class AuthenticationTests
 {
     private readonly PackleadApiFactory _factory;
 
