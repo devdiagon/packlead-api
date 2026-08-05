@@ -1,5 +1,7 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Packlead.Application.Common.Interfaces;
+using Packlead.Infrastructure.Firebase;
 
 namespace Packlead.Api.Config;
 
@@ -25,6 +27,8 @@ public static class FirebaseExtensions
                 ProjectId = configuration["Firebase:ProjectId"]
             });
         });
+
+        services.AddScoped<IFirebaseUserService, FirebaseUserService>();
 
         return services;
     }
