@@ -46,9 +46,17 @@ public class CreateDispatcherCommand
         {
             await _repository.CreateAsync(dispatcher);
         }
-        catch when (!isMigration)
+        catch (Exception persistenceException) when (!isMigration)
         {
-            await _firebaseUserService.DeleteUserAsync(firebaseUid, ct);
+            try
+            {
+                await _firebaseUserService.DeleteUserAsync(firebaseUid, ct);
+            }
+            catch
+            {
+                // fallo del rollback
+            }
+
             throw;
         }
 
