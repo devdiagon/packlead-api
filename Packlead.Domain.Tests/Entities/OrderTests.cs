@@ -2,7 +2,6 @@
 using Packlead.Domain.Enums;
 using Packlead.Domain.Exceptions;
 using Packlead.Domain.ValueObjects;
-using Xunit;
 
 namespace Packlead.Domain.Tests.Entities;
 
@@ -73,6 +72,6 @@ public class OrderTests
     [InlineData(0, -181)]
     public void Location_Rejects_Out_Of_Range_Coordinates(double lat, double lng)
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Location(lat, lng));
+        Assert.Throws<InvalidLocationException>(() => new Location(lat, lng));
     }
 }
