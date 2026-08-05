@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Packlead.Application.Orders.Commands;
 using Packlead.Application.Orders.DTOs;
 using Packlead.Application.Orders.Queries;
-using Packlead.Domain.Entities;
 using System.Security.Claims;
 
 namespace Packlead.Api.Controllers;
@@ -35,7 +34,7 @@ public class OrdersController : ControllerBase
     // GET /orders?state=pending&dispatcherId=xxx
     [Authorize(Policy = "AuthenticatedOnly")]
     [HttpGet]
-    public async Task<IActionResult> GetAll(
+    public async Task<ActionResult<IEnumerable<OrderResponse>>> GetAll(
         [FromQuery] string? state,
         [FromQuery] Guid? dispatcherId,
         CancellationToken ct)
