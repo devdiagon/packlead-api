@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Packlead.Application.Common.Exceptions;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -34,15 +35,21 @@ public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions
             return Task.FromResult(AuthenticateResult.NoResult());
         }
 
+        var hasRole = Request.Headers.TryGetValue(RoleHeader, out var role) &&
+                     !string.IsNullOrWhiteSpace(role);
+
+        if (!hasRole)
+        {
+            // Replica comportamiento de FirebaseAuthenticationMiddleware: un "token"
+            // autenticado sin claim de rol lanza un 400 MissingRoleClaim.
+            throw new MissingRoleClaimException();
+        }
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, "test-firebase-uid"),
+            new(ClaimTypes.Role, role!),
         };
-
-        if (Request.Headers.TryGetValue(RoleHeader, out var role) && !string.IsNullOrWhiteSpace(role))
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role!));
-        }
 
         if (Request.Headers.TryGetValue(DispatcherIdHeader, out var dispatcherId) &&
             !string.IsNullOrWhiteSpace(dispatcherId))
