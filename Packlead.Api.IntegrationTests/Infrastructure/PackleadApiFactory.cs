@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
+using Packlead.Application.Common.Interfaces;
 using Packlead.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 
@@ -22,6 +24,8 @@ public class PackleadApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         .WithUsername("packlead_test")
         .WithPassword("packlead_test")
         .Build();
+
+    public Mock<IFirebaseUserService> FirebaseUserServiceMock { get; } = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -43,6 +47,16 @@ public class PackleadApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
                 .AddAuthentication(TestAuthHandler.SchemeName)
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                     TestAuthHandler.SchemeName, _ => { });
+
+            // 3. Reemplazar IFirebaseUserService por el mock único y persistente del factory.
+            var firebaseUserServiceDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IFirebaseUserService));
+            if (firebaseUserServiceDescriptor is not null)
+            {
+                services.Remove(firebaseUserServiceDescriptor);
+            }
+
+            services.AddScoped(_ => FirebaseUserServiceMock.Object);
         });
     }
 
