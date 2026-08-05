@@ -1,7 +1,7 @@
 ﻿using Packlead.Domain.Entities;
 using Packlead.Domain.Enums;
 
-namespace Packlead.Domain.Tests;
+namespace Packlead.Domain.Tests.Entities;
 public class DispatcherTests
 {
     private static Dispatcher NewDispatcher(string firebaseUid = "uid-123") =>
