@@ -16,10 +16,11 @@ public class UpdateOrderCommand
         _dispatcherRepository = dispatcherRepository;
     }
 
-    public async Task<OrderResponse?> ExecuteAsync(Guid id, UpdateOrderRequest request, CancellationToken ct = default)
+    public async Task<OrderResponse> ExecuteAsync(Guid id, UpdateOrderRequest request, CancellationToken ct = default)
     {
         var order = await _repository.GetByIdAsync(id, ct);
-        if (order is null) return null;
+        if (order is null)
+            throw new OrderNotFoundException();
 
         // Actualizar datos descriptivos mediante métodos de la entidad
         order.UpdateDetails(

@@ -63,7 +63,7 @@ public sealed class FirebaseUserService : IFirebaseUserService
 
     public async Task DeleteUserAsync(string firebaseUid, CancellationToken ct)
     {
-        await FirebaseAuth.DefaultInstance.DeleteUserAsync(firebaseUid);
+         await FirebaseAuth.DefaultInstance.DeleteUserAsync(firebaseUid);
     }
 
     private async Task TryDeleteOrphanUserAsync(string uid)

@@ -5,8 +5,8 @@ public class OrderNotFoundException : AppException
     public override int StatusCode => 404;
     public override string ErrorCode => "NotFound";
 
-    public OrderNotFoundException(Guid id)
-        : base($"Order with id '{id}' was not found.") { }
+    public OrderNotFoundException()
+        : base($"Order was not found.") { }
 }
 
 public class DispatcherNotAvailableException : AppException
