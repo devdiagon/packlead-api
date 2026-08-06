@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit tests (Domain + Application)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore Packlead.slnx
+
+      - name: Build
+        run: dotnet build Packlead.slnx --no-restore --configuration Release
+
+      - name: Test - Domain
+        run: dotnet test Packlead.Domain.Tests --no-build --configuration Release --logger "trx;LogFileName=domain-tests.trx"
+
+      - name: Test - Application
+        run: dotnet test Packlead.Application.Tests --no-build --configuration Release --logger "trx;LogFileName=application-tests.trx"
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: '**/*.trx'
+
+  integration-tests:
+    name: Integration tests (API + Testcontainers)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore Packlead.slnx
+
+      - name: Build
+        run: dotnet build Packlead.slnx --no-restore --configuration Release
+
+      - name: Test - Api.IntegrationTests
+        run: dotnet test Packlead.Api.IntegrationTests --no-build --configuration Release --logger "trx;LogFileName=integration-tests.trx"
+
+      - name: Publish test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: '**/*.trx'
