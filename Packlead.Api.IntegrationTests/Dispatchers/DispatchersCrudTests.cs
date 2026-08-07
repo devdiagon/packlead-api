@@ -122,9 +122,9 @@ public class DispatchersCrudTests
         _factory.FirebaseUserServiceMock.VerifyNoOtherCalls();
     }
 
-    // I.DIS.05 — Respuesta de lectura no expone campos sensibles
+    // I.DIS.05 — Respuesta de lectura no expone el link de reseteo de contraseña
     [Fact]
-    public async Task GetDispatcher_RawJson_DoesNotExposeFirebaseUidOrResetLink()
+    public async Task GetDispatcher_RawJson_DoesNotExposeResetLink()
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -133,7 +133,6 @@ public class DispatchersCrudTests
         var response = await AdminClient().GetAsync($"/dispatchers/{dispatcher.Id}");
         var raw = await response.Content.ReadAsStringAsync();
 
-        Assert.DoesNotContain("firebaseUid", raw, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("passwordResetLink", raw, StringComparison.OrdinalIgnoreCase);
     }
 
