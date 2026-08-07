@@ -10,15 +10,13 @@ public static class FirebaseExtensions
     public static IServiceCollection AddFirebaseAdmin(
         this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
-        // Firebase configuration
-        var serviceAccountPath = configuration["Firebase:ServiceAccountPath"]
-            ?? throw new InvalidOperationException(
-                "Falta la clave 'Firebase:ServiceAccountPath' en la configuración.");
-
         services.AddSingleton(_ =>
         {
             var credential = environment.IsDevelopment()
-                ? LoadServiceAccountCredential(serviceAccountPath)
+                ? LoadServiceAccountCredential(
+                    configuration["Firebase:ServiceAccountPath"]
+                        ?? throw new InvalidOperationException(
+                            "Falta la clave 'Firebase:ServiceAccountPath' en la configuración."))
                 : GoogleCredential.GetApplicationDefault();
 
             return FirebaseApp.Create(new AppOptions

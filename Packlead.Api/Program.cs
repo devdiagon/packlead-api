@@ -7,10 +7,18 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddApiValidation();
 builder.Services.AddFirebaseAuthAndPolicies();
 builder.Services.AddApiOpenApi();
-builder.Services.AddFirebaseAdmin(builder.Configuration, builder.Environment);
+
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddFirebaseAdmin(builder.Configuration, builder.Environment);
+}
 
 var app = builder.Build();
-app.Services.GetRequiredService<FirebaseAdmin.FirebaseApp>();
+
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    app.Services.GetRequiredService<FirebaseAdmin.FirebaseApp>();
+}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<FirebaseAuthenticationMiddleware>();

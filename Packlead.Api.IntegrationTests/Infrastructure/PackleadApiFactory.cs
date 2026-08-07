@@ -29,6 +29,8 @@ public class PackleadApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Testing");
+
         builder.ConfigureServices(services =>
         {
             // 1. Reemplazar el DbContext por uno apuntando al contenedor de test.
