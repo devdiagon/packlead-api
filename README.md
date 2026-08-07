@@ -108,5 +108,3 @@ dotnet test
 ```
 
 Integration tests require Docker running locally.
-
----
