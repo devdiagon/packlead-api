@@ -187,4 +187,26 @@ public class DispatchersCrudTests
         var raw = await getOrderResponse.Content.ReadAsStringAsync();
         Assert.Contains("\"dispatcherId\":null", raw);
     }
+
+    // I.DIS.09 — Falla el borrado en Firebase -> no se borra en DB
+    [Fact]
+    public async Task DeleteDispatcher_FirebaseDeletionFails_ReturnsErrorAndKeepsDispatcher()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var dispatcher = TestDataSeeder.SeedDispatcher(db);
+
+        _factory.FirebaseUserServiceMock.Reset();
+        _factory.FirebaseUserServiceMock
+            .Setup(s => s.DeleteUserAsync(dispatcher.FirebaseUid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new FirebaseUserDeletionException(
+                dispatcher.FirebaseUid, new InvalidOperationException("Firebase unreachable")));
+
+        var deleteResponse = await AdminClient().DeleteAsync($"/dispatchers/{dispatcher.Id}");
+
+        Assert.Equal(HttpStatusCode.BadGateway, deleteResponse.StatusCode);
+
+        var getResponse = await AdminClient().GetAsync($"/dispatchers/{dispatcher.Id}");
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+    }
 }

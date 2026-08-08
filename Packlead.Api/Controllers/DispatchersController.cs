@@ -70,9 +70,9 @@ public class DispatchersController : ControllerBase
 
     [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
     {
-        await _delete.ExecuteAsync(id);
+        await _delete.ExecuteAsync(id, ct);
         return NoContent();
     }
 }
