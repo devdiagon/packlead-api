@@ -3,7 +3,9 @@
 [![CI](https://github.com/devdiagon/packlead-api/actions/workflows/ci.yml/badge.svg)](https://github.com/devdiagon/packlead-api/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/download)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-EF%20Core-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com/)
 [![Firebase Auth](https://img.shields.io/badge/Auth-Firebase-FFCA28?logo=firebase&logoColor=white)](https://firebase.google.com/)
+[![Google Cloud](https://img.shields.io/badge/Deploy-Google%20Cloud%20Run-4285F4?logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
 
 A backend service built with **ASP.NET Core (.NET 10)** for managing the CRUD operations of orders and deliveries for the [Packlead](https://github.com/devdiagon/packlead) mobile app, with support for two roles: **Admin** and **Dispatcher**.
 
