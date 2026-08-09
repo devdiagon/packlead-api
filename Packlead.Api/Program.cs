@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Packlead.Api.Config;
 using Packlead.Api.Middleware;
 
@@ -13,7 +14,16 @@ if (!builder.Environment.IsEnvironment("Testing"))
     builder.Services.AddFirebaseAdmin(builder.Configuration, builder.Environment);
 }
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (!app.Environment.IsEnvironment("Testing"))
 {
@@ -27,8 +37,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseApiOpenApiInDevelopment();
-
-app.UseHttpsRedirection();
 
 app.MapControllers();
 
