@@ -38,6 +38,8 @@ app.UseAuthorization();
 
 app.UseApiOpenApiInDevelopment();
 
+app.MapGet("/health", () => Results.Ok()).AllowAnonymous();
+
 app.MapControllers();
 
 app.Run();
