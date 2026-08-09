@@ -67,13 +67,15 @@ The `Domain` and `Application` layers never depend on `Infrastructure` or `Api`,
    cd Packlead
    ```
 
-2. Start PostgreSQL with Docker Compose:
+2. Configure local credentials (connection string, Firebase credentials) via [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) or environment variables. 
+
+> If you're running the API through Docker Compose, use [`.env.dev.local.example`](./.env.dev.local.example) as a reference: copy it to `.env.dev.local` and fill in the values (following the comments). It also expects your Firebase service account JSON key to be placed at `secrets/firebase-service-account.json`, which `docker-compose.yml` mounts into the `api` container.
+
+3. Start PostgreSQL with Docker Compose:
 
    ```bash
-   docker compose up -d
+   docker compose up -d postgres
    ```
-
-3. Configure local credentials (connection string, Firebase credentials) via [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) or environment variables.
 
 4. Apply the database migrations:
 
@@ -81,10 +83,18 @@ The `Domain` and `Application` layers never depend on `Infrastructure` or `Api`,
    dotnet ef database update --project Packlead.Infrastructure --startup-project Packlead.Api
    ```
 
+   > This is required before starting the API service.
+
 5. Run the API:
 
    ```bash
    dotnet run --project Packlead.Api
+   ```
+
+   Or to run the API itself through its Docker image:
+
+   ```bash
+   docker compose up -d api
    ```
 
 6. In the development environment, interactive API documentation is available at `/scalar`.

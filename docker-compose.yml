@@ -12,5 +12,23 @@ services:
     volumes:
       - packlead_pgdata:/var/lib/postgresql/data
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: packlead-api
+    env_file:
+      - .env.dev.local
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:5058
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=packlead_db;Username=packlead;Password=packlead_dev
+    ports:
+      - "5058:5058"
+    depends_on:
+      - postgres
+    volumes:
+      - ./secrets/firebase-service-account.json:/app/firebase-service-account.json:ro
+
 volumes:
   packlead_pgdata:

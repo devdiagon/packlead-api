@@ -378,7 +378,9 @@ appsettings.*.json
 
 # Docker
 .env
-docker-compose.override.yml
+.env.*
+!.env.dev.local.example
+secrets/
 
 # EF Core / Local DB
 *.db
