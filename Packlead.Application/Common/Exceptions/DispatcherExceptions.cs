@@ -26,3 +26,12 @@ public class DispatcherRecordMissingException : AppException
     public DispatcherRecordMissingException()
         : base("No dispatcher record found for this account. Contact an administrator.") { }
 }
+
+public class DispatcherInactiveException : AppException
+{
+    public override int StatusCode => 401;
+    public override string ErrorCode => "DispatcherInactive";
+
+    public DispatcherInactiveException()
+        : base("This dispatcher account is inactive.") { }
+}

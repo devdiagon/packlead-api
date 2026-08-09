@@ -1,6 +1,7 @@
 ﻿using FirebaseAdmin.Auth;
 using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
+using Packlead.Domain.Enums;
 using System.Security.Claims;
 
 public class FirebaseAuthenticationMiddleware
@@ -41,6 +42,15 @@ public class FirebaseAuthenticationMiddleware
         var role = decoded.Claims.TryGetValue("role", out var r) ? r?.ToString() : "none";
         role ??= "none";
 
+        var claims = await BuildClaimsAsync(decoded.Uid, role, dispatcherRepository);
+
+        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Firebase"));
+        await _next(context);
+    }
+
+    public static async Task<List<Claim>> BuildClaimsAsync(
+        string uid, string role, IDispatcherRepository dispatcherRepository)
+    {
         if (string.Equals(role, "none", StringComparison.OrdinalIgnoreCase))
         {
             throw new MissingRoleClaimException();
@@ -48,21 +58,23 @@ public class FirebaseAuthenticationMiddleware
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, decoded.Uid),
+            new(ClaimTypes.NameIdentifier, uid),
             new(ClaimTypes.Role, role)
         };
 
         if (string.Equals(role, "dispatcher", StringComparison.OrdinalIgnoreCase))
         {
-            var dispatcher = await dispatcherRepository.GetByFirebaseUidAsync(decoded.Uid);
+            var dispatcher = await dispatcherRepository.GetByFirebaseUidAsync(uid);
 
             if (dispatcher is null)
                 throw new DispatcherRecordMissingException();
 
+            if (dispatcher.State == DispatcherState.Inactive)
+                throw new DispatcherInactiveException();
+
             claims.Add(new Claim("dispatcherId", dispatcher.Id.ToString()));
         }
 
-        context.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "Firebase"));
-        await _next(context);
+        return claims;
     }
 }

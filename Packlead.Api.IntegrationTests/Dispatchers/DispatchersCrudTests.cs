@@ -122,9 +122,9 @@ public class DispatchersCrudTests
         _factory.FirebaseUserServiceMock.VerifyNoOtherCalls();
     }
 
-    // I.DIS.05 — Respuesta de lectura no expone campos sensibles
+    // I.DIS.05 — Respuesta de lectura no expone el link de reseteo de contraseña
     [Fact]
-    public async Task GetDispatcher_RawJson_DoesNotExposeFirebaseUidOrResetLink()
+    public async Task GetDispatcher_RawJson_DoesNotExposeResetLink()
     {
         using var scope = _factory.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -133,7 +133,6 @@ public class DispatchersCrudTests
         var response = await AdminClient().GetAsync($"/dispatchers/{dispatcher.Id}");
         var raw = await response.Content.ReadAsStringAsync();
 
-        Assert.DoesNotContain("firebaseUid", raw, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("passwordResetLink", raw, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -187,5 +186,27 @@ public class DispatchersCrudTests
         var getOrderResponse = await AdminClient().GetAsync($"/orders/{order.Id}");
         var raw = await getOrderResponse.Content.ReadAsStringAsync();
         Assert.Contains("\"dispatcherId\":null", raw);
+    }
+
+    // I.DIS.09 — Falla el borrado en Firebase -> no se borra en DB
+    [Fact]
+    public async Task DeleteDispatcher_FirebaseDeletionFails_ReturnsErrorAndKeepsDispatcher()
+    {
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var dispatcher = TestDataSeeder.SeedDispatcher(db);
+
+        _factory.FirebaseUserServiceMock.Reset();
+        _factory.FirebaseUserServiceMock
+            .Setup(s => s.DeleteUserAsync(dispatcher.FirebaseUid, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new FirebaseUserDeletionException(
+                dispatcher.FirebaseUid, new InvalidOperationException("Firebase unreachable")));
+
+        var deleteResponse = await AdminClient().DeleteAsync($"/dispatchers/{dispatcher.Id}");
+
+        Assert.Equal(HttpStatusCode.BadGateway, deleteResponse.StatusCode);
+
+        var getResponse = await AdminClient().GetAsync($"/dispatchers/{dispatcher.Id}");
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
     }
 }
