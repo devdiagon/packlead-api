@@ -43,6 +43,9 @@ jobs:
         run: |
           docker push ${{ vars.GCP_REGION }}-docker.pkg.dev/${{ vars.GCP_PROJECT_ID }}/${{ vars.ARTIFACT_REGISTRY_REPO }}/api:${{ github.sha }}
 
+      - name: Restore
+        run: dotnet restore Packlead.slnx
+
       - name: Apply database migrations
         env:
           ConnectionStrings__DefaultConnection: ${{ secrets.SUPABASE_MIGRATION_CONNECTION_STRING }}
