@@ -1,4 +1,5 @@
-﻿using Packlead.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Orders.DTOs;
 using Packlead.Domain.Entities;
 using Packlead.Domain.ValueObjects;
@@ -8,10 +9,12 @@ namespace Packlead.Application.Orders.Commands;
 public class CreateOrderCommand
 {
     private readonly IOrderRepository _repository;
+    private readonly ILogger<CreateOrderCommand> _logger;
 
-    public CreateOrderCommand(IOrderRepository repository)
+    public CreateOrderCommand(IOrderRepository repository, ILogger<CreateOrderCommand> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<OrderResponse> ExecuteAsync(CreateOrderRequest request, CancellationToken ct = default)
@@ -26,6 +29,11 @@ public class CreateOrderCommand
             dispatcherId: request.DispatcherId);
 
         await _repository.AddAsync(order, ct);
+
+        _logger.LogInformation(
+            "Order {OrderId} created for zone {Zone}, dispatcher {DispatcherId}",
+            order.Id, order.Zone, order.DispatcherId);
+
         return order.ToResponse();
     }
 }

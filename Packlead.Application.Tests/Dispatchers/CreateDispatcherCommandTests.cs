@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.Commands;
@@ -13,7 +14,7 @@ public class CreateDispatcherCommandTests
     private readonly Mock<IFirebaseUserService> _firebaseUserService = new();
 
     private CreateDispatcherCommand CreateSut() =>
-        new(_dispatcherRepository.Object, _firebaseUserService.Object);
+        new(_dispatcherRepository.Object, _firebaseUserService.Object, NullLogger<CreateDispatcherCommand>.Instance);
 
     private static CreateDispatcherRequest MigrationRequest(string firebaseUid = "existing-uid") => new()
     {

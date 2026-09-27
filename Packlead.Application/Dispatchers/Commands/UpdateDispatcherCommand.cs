@@ -1,4 +1,4 @@
-﻿using Packlead.Application.Common.Exceptions;
+﻿using Microsoft.Extensions.Logging;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.DTOs;
 using Packlead.Domain.Enums;
@@ -8,10 +8,12 @@ namespace Packlead.Application.Dispatchers.Commands;
 public class UpdateDispatcherCommand
 {
     private readonly IDispatcherRepository _repository;
+    private readonly ILogger<UpdateDispatcherCommand> _logger;
 
-    public UpdateDispatcherCommand(IDispatcherRepository repository)
+    public UpdateDispatcherCommand(IDispatcherRepository repository, ILogger<UpdateDispatcherCommand> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
 
     public async Task<DispatcherResponse> ExecuteAsync(Guid id, UpdateDispatcherRequest request)
@@ -33,6 +35,10 @@ public class UpdateDispatcherCommand
             dispatcher.SetState(DispatcherState.Inactive);
 
         await _repository.UpdateAsync(dispatcher);
+
+        _logger.LogInformation(
+            "Dispatcher {DispatcherId} updated, state {State}",
+            dispatcher.Id, dispatcher.State);
 
         return dispatcher.ToResponse();
     }

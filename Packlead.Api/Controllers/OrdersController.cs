@@ -81,8 +81,6 @@ public class OrdersController : ControllerBase
         {
             var ownDispatcherId = Guid.Parse(User.FindFirst("dispatcherId")!.Value);
 
-            Console.WriteLine(ownDispatcherId);
-
             var existing = await _getById.ExecuteAsync(id);
             if (existing is null) return NotFound();
             if (existing.DispatcherId != ownDispatcherId)

@@ -1,4 +1,5 @@
-﻿using Packlead.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.DTOs;
 using Packlead.Domain.Entities;
 
@@ -8,11 +9,16 @@ public class CreateDispatcherCommand
 {
     private readonly IDispatcherRepository _repository;
     private readonly IFirebaseUserService _firebaseUserService;
+    private readonly ILogger<CreateDispatcherCommand> _logger;
 
-    public CreateDispatcherCommand(IDispatcherRepository repository, IFirebaseUserService firebaseUserService)
+    public CreateDispatcherCommand(
+        IDispatcherRepository repository,
+        IFirebaseUserService firebaseUserService,
+        ILogger<CreateDispatcherCommand> logger)
     {
         _repository = repository;
         _firebaseUserService = firebaseUserService;
+        _logger = logger;
     }
 
     public async Task<CreateDispatcherResponse> ExecuteAsync(CreateDispatcherRequest request, CancellationToken ct)
@@ -59,6 +65,10 @@ public class CreateDispatcherCommand
 
             throw;
         }
+
+        _logger.LogInformation(
+            "Dispatcher {DispatcherId} created (Firebase UID {FirebaseUid})",
+            dispatcher.Id, dispatcher.FirebaseUid);
 
         var baseResponse = dispatcher.ToResponse();
         return CreateDispatcherResponse.FromDispatcherResponse(baseResponse, passwordResetLink);

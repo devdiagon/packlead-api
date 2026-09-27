@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
@@ -12,7 +13,7 @@ public class DeleteDispatcherCommandTests
     private readonly Mock<IFirebaseUserService> _firebaseUserService = new();
 
     private DeleteDispatcherCommand CreateSut() =>
-        new(_dispatcherRepository.Object, _firebaseUserService.Object);
+        new(_dispatcherRepository.Object, _firebaseUserService.Object, NullLogger<DeleteDispatcherCommand>.Instance);
 
     private static Dispatcher ExistingDispatcher(string firebaseUid = "existing-uid") =>
         new(firebaseUid, "Carlos Rivera", "carlos@packlead.com", "Moto", "ABC-123");
