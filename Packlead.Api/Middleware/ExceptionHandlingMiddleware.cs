@@ -23,15 +23,23 @@ public class ExceptionHandlingMiddleware
         }
         catch (AppException ex)
         {
+            _logger.LogWarning(
+                "Request failed with {ErrorCode} ({StatusCode}): {Message}",
+                ex.ErrorCode, ex.StatusCode, ex.Message);
             await WriteErrorResponse(context, ex.StatusCode, ex.ErrorCode, ex.Message);
         }
         catch (DomainExceptions ex)
         {
+            var errorCode = ex.GetType().Name.Replace("Exception", string.Empty);
+            _logger.LogWarning(
+                "Request failed with {ErrorCode} (400): {Message}",
+                errorCode, ex.Message);
+
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsJsonAsync(new
             {
                 status = 400,
-                error = ex.GetType().Name.Replace("Exception", string.Empty),
+                error = errorCode,
                 message = ex.Message
             });
         }

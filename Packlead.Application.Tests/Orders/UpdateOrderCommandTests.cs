@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging.Abstractions;
+using Moq;
 using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Orders.Commands;
 using Packlead.Application.Orders.DTOs;
@@ -14,7 +15,7 @@ public class UpdateOrderCommandTests
     private readonly Mock<IDispatcherRepository> _dispatcherRepository = new();
 
     private UpdateOrderCommand CreateSut() =>
-        new(_orderRepository.Object, _dispatcherRepository.Object);
+        new(_orderRepository.Object, _dispatcherRepository.Object, NullLogger<UpdateOrderCommand>.Instance);
 
     private static Order PendingOrder() => new(
         clientName: "Jane Doe",

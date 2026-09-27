@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Auth;
+using Microsoft.Extensions.Logging;
 using Packlead.Application.Common.Exceptions;
 using Packlead.Application.Common.Interfaces;
 using System.Security.Cryptography;
@@ -9,6 +10,13 @@ public sealed class FirebaseUserService : IFirebaseUserService
 {
     private const string RoleClaimKey = "role";
     private const string DispatcherRoleValue = "dispatcher";
+
+    private readonly ILogger<FirebaseUserService> _logger;
+
+    public FirebaseUserService(ILogger<FirebaseUserService> logger)
+    {
+        _logger = logger;
+    }
 
     public async Task<string> CreateDispatcherUserAsync(string email, CancellationToken ct)
     {
@@ -79,9 +87,12 @@ public sealed class FirebaseUserService : IFirebaseUserService
         {
             await FirebaseAuth.DefaultInstance.DeleteUserAsync(uid);
         }
-        catch
+        catch (Exception ex)
         {
-            // Si falla, queda un usuario en Firebase sin claim de rol.
+            _logger.LogError(
+                ex,
+                "Failed to delete orphaned Firebase user {FirebaseUid} after a custom-claims failure — user has no role claim",
+                uid);
         }
     }
 

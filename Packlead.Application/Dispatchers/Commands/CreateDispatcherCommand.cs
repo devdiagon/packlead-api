@@ -1,4 +1,5 @@
-﻿using Packlead.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Dispatchers.DTOs;
 using Packlead.Domain.Entities;
 
@@ -8,11 +9,16 @@ public class CreateDispatcherCommand
 {
     private readonly IDispatcherRepository _repository;
     private readonly IFirebaseUserService _firebaseUserService;
+    private readonly ILogger<CreateDispatcherCommand> _logger;
 
-    public CreateDispatcherCommand(IDispatcherRepository repository, IFirebaseUserService firebaseUserService)
+    public CreateDispatcherCommand(
+        IDispatcherRepository repository,
+        IFirebaseUserService firebaseUserService,
+        ILogger<CreateDispatcherCommand> logger)
     {
         _repository = repository;
         _firebaseUserService = firebaseUserService;
+        _logger = logger;
     }
 
     public async Task<CreateDispatcherResponse> ExecuteAsync(CreateDispatcherRequest request, CancellationToken ct)
@@ -52,13 +58,20 @@ public class CreateDispatcherCommand
             {
                 await _firebaseUserService.DeleteUserAsync(firebaseUid, ct);
             }
-            catch
+            catch (Exception rollbackException)
             {
-                // fallo del rollback
+                _logger.LogError(
+                    rollbackException,
+                    "Failed to roll back Firebase user {FirebaseUid} after a persistence failure — orphaned Firebase account",
+                    firebaseUid);
             }
 
             throw;
         }
+
+        _logger.LogInformation(
+            "Dispatcher {DispatcherId} created (Firebase UID {FirebaseUid})",
+            dispatcher.Id, dispatcher.FirebaseUid);
 
         var baseResponse = dispatcher.ToResponse();
         return CreateDispatcherResponse.FromDispatcherResponse(baseResponse, passwordResetLink);

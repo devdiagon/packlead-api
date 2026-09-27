@@ -4,6 +4,17 @@ using Packlead.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Logging.AddSimpleConsole(options => options.SingleLine = true);
+    builder.Logging.AddDebug();
+}
+else
+{
+    builder.Logging.AddJsonConsole();
+}
+
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddApiValidation();
 builder.Services.AddFirebaseAuthAndPolicies();

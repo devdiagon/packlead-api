@@ -1,4 +1,5 @@
-﻿using Packlead.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using Packlead.Application.Common.Interfaces;
 using Packlead.Application.Orders.DTOs;
 using Packlead.Domain.Enums;
 using Packlead.Domain.ValueObjects;
@@ -9,11 +10,16 @@ public class UpdateOrderCommand
 {
     private readonly IOrderRepository _repository;
     private readonly IDispatcherRepository _dispatcherRepository;
+    private readonly ILogger<UpdateOrderCommand> _logger;
 
-    public UpdateOrderCommand(IOrderRepository repository, IDispatcherRepository dispatcherRepository)
+    public UpdateOrderCommand(
+        IOrderRepository repository,
+        IDispatcherRepository dispatcherRepository,
+        ILogger<UpdateOrderCommand> logger)
     {
         _repository = repository;
         _dispatcherRepository = dispatcherRepository;
+        _logger = logger;
     }
 
     public async Task<OrderResponse> ExecuteAsync(Guid id, UpdateOrderRequest request, CancellationToken ct = default)
@@ -42,7 +48,12 @@ public class UpdateOrderCommand
                     throw new DispatcherNotFoundException();
 
                 if (dispatcher.State != DispatcherState.Available)
+                {
+                    _logger.LogWarning(
+                        "Attempted to assign dispatcher {DispatcherId} to order {OrderId} while in state {State}",
+                        dispatcher.Id, id, dispatcher.State);
                     throw new DispatcherNotAvailableException("El repartidor no se encuentra disponible.");
+                }
             }
             order.AssignDispatcher(request.DispatcherId.Value);
         }
@@ -55,6 +66,11 @@ public class UpdateOrderCommand
         }
 
         await _repository.UpdateAsync(order, ct);
+
+        _logger.LogInformation(
+            "Order {OrderId} updated, state {State}, dispatcher {DispatcherId}",
+            order.Id, order.State, order.DispatcherId);
+
         return order.ToResponse();
     }
 }
