@@ -16,19 +16,22 @@ public class OrdersController : ControllerBase
     private readonly CreateOrderCommand _create;
     private readonly UpdateOrderCommand _update;
     private readonly DeleteOrderCommand _delete;
+    private readonly ILogger<OrdersController> _logger;
 
     public OrdersController(
         GetAllOrdersQuery getAll,
         GetOrderByIdQuery getById,
         CreateOrderCommand create,
         UpdateOrderCommand update,
-        DeleteOrderCommand delete)
+        DeleteOrderCommand delete,
+        ILogger<OrdersController> logger)
     {
         _getAll = getAll;
         _getById = getById;
         _create = create;
         _update = update;
         _delete = delete;
+        _logger = logger;
     }
 
     // GET /orders?state=pending&dispatcherId=xxx
@@ -84,7 +87,12 @@ public class OrdersController : ControllerBase
             var existing = await _getById.ExecuteAsync(id);
             if (existing is null) return NotFound();
             if (existing.DispatcherId != ownDispatcherId)
+            {
+                _logger.LogWarning(
+                    "Dispatcher {DispatcherId} attempted to update order {OrderId} assigned to a different dispatcher",
+                    ownDispatcherId, id);
                 return Forbid();
+            }
 
             // Restricción de campos: el dispatcher solo puede tocar `state`,
             // no reasignar cliente, dirección, dispatcherId, etc.

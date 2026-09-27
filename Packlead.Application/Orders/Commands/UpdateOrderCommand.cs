@@ -48,7 +48,12 @@ public class UpdateOrderCommand
                     throw new DispatcherNotFoundException();
 
                 if (dispatcher.State != DispatcherState.Available)
+                {
+                    _logger.LogWarning(
+                        "Attempted to assign dispatcher {DispatcherId} to order {OrderId} while in state {State}",
+                        dispatcher.Id, id, dispatcher.State);
                     throw new DispatcherNotAvailableException("El repartidor no se encuentra disponible.");
+                }
             }
             order.AssignDispatcher(request.DispatcherId.Value);
         }

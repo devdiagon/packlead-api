@@ -7,8 +7,13 @@ using System.Security.Claims;
 public class FirebaseAuthenticationMiddleware
 {
     private readonly RequestDelegate _next;
+    private readonly ILogger<FirebaseAuthenticationMiddleware> _logger;
 
-    public FirebaseAuthenticationMiddleware(RequestDelegate next) => _next = next;
+    public FirebaseAuthenticationMiddleware(RequestDelegate next, ILogger<FirebaseAuthenticationMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
 
     public async Task InvokeAsync(HttpContext context, IDispatcherRepository dispatcherRepository)
     {
@@ -27,8 +32,10 @@ public class FirebaseAuthenticationMiddleware
         {
             decoded = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(token);
         }
-        catch (FirebaseAuthException)
+        catch (FirebaseAuthException ex)
         {
+            _logger.LogWarning(ex, "Rejected request with an invalid or expired Firebase token");
+
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsJsonAsync(new
             {

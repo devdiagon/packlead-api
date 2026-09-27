@@ -58,9 +58,12 @@ public class CreateDispatcherCommand
             {
                 await _firebaseUserService.DeleteUserAsync(firebaseUid, ct);
             }
-            catch
+            catch (Exception rollbackException)
             {
-                // fallo del rollback
+                _logger.LogError(
+                    rollbackException,
+                    "Failed to roll back Firebase user {FirebaseUid} after a persistence failure — orphaned Firebase account",
+                    firebaseUid);
             }
 
             throw;
